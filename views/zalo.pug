@@ -1,0 +1,16 @@
+extends layout
+
+block content
+	form(action="/change/password" method="post")
+		.box-au.box-forgot
+			.line-form.has-ico.custom_password_form
+				input(name="sdt", tabindex='1', autocomplete='off', type='text', placeholder='Số điện thoại đăng ký.')
+			.line-form.has-ico.custom_password_form
+				input(name="oldpassword", tabindex='2', autocomplete='off', type='password', placeholder='Vui lòng nhập mật khẩu hiện tại')
+			.line-form.has-ico.custom_password_form
+				input(name="newpassword", tabindex='3', autocomplete='off', type='password', placeholder='Vui lòng nhập mật khẩu mới.')
+			.line-form.has-ico.custom_password_form
+				input(name="repassword", tabindex='4', autocomplete='off', type='password', placeholder='Nhập lại mật khẩu mới')
+		.textAlign-center
+			button.btn.textAlign-center.btn-primary(type='submit' style="float: center;height:35px") Xác nhận
+				

